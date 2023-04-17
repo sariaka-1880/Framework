@@ -99,13 +99,11 @@ public static List<Class<?>> getClassesInPackage(String packageName) {
 }
 
 
-public String Url(String contextPath,String url){
-  contextPath="/";
+public String getLastPartOfUrl(String url) {
 
-  int indexPath = url.indexOf(contextPath);
-  String lasturl =url.substring(indexPath+ contextPath.length());
-
-  return lasturl;
+  int lastSlashIndex = url.lastIndexOf("/");
+  return url.substring(lastSlashIndex);
+  
 }
 
 }

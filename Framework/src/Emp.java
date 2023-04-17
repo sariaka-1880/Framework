@@ -3,6 +3,7 @@ package model;
 import java.util.HashMap;
 
 import etu1880.framework.MethodAnnotation;
+import etu1880.framework.ModelView;
 
 
 public class Emp {
@@ -22,9 +23,11 @@ public class Emp {
     this.prenom = prenom;
   }
 
-  @MethodAnnotation(url ="test")
-  public void Affichernom(){
-    System.out.println("hey");
+  @MethodAnnotation(url ="/test")
+
+  public ModelView Affichernom(){
+
+    return new ModelView("test.jsp");
   
   }
 
