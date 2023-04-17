@@ -27,7 +27,10 @@ public class Emp {
 
   public ModelView Affichernom(){
 
-    return new ModelView("test.jsp");
+    HashMap<String,Object> data=new HashMap<String,Object>();
+
+    data.put("test", "sariaka");
+    return new ModelView("test.jsp",data);
   
   }
 

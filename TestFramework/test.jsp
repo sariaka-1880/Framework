@@ -9,5 +9,9 @@
 </head>
 <body>
   Bienvenue
+  <%
+  String datatest = (String) request.getAttribute("test");
+  out.print(datatest);
+  %>
 </body>
 </html>
