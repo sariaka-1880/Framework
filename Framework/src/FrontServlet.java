@@ -108,6 +108,20 @@ public void init(PrintWriter out) {
             Object o = classe.getDeclaredConstructor().newInstance();
             ModelView mview = (ModelView) o.getClass().getMethod(mapping.getMethod()).invoke(o);
 
+            HashMap<String,Object> datatest=new HashMap<String,Object>();
+            
+            datatest=mview.getData();
+            
+            if(datatest==null){
+                out.print("null");
+            }
+            if(datatest!=null){
+                for (String key :datatest.keySet()){
+                    Object dataObject=datatest.get(key);
+                       request.setAttribute(key,dataObject);            
+                }
+                
+            }
 
             RequestDispatcher dispatcher = request.getRequestDispatcher(mview.getView());
             dispatcher.forward(request, response);
