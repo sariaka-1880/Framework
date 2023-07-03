@@ -5,20 +5,23 @@ import etu1880.framework.Mapping;
 import etu1880.framework.MethodAnnotation;
 import etu1880.framework.ModelView;
 
-
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.lang.reflect.*;
+
 import jakarta.servlet.RequestDispatcher;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import model.Emp;
 
 
 
@@ -37,7 +40,7 @@ public void init(PrintWriter out) {
 
         List<String> list=new ArrayList<>();
         
-        list=this.util.getconfig("C:/Program Files/Apache Software Foundation/Tomcat 10.0/webapps/test/WEB-INF/config.xml",out);
+        list=this.util.getconfig("C:/Program Files/Apache Software Foundation/Tomcat 10.0/webapps/TestFramework/WEB-INF/config.xml",out);
         for(String liste : list){
             List<Class<?>> allClass = util.getClassesInPackage(liste);  
             Mapping mapping;
@@ -52,7 +55,6 @@ public void init(PrintWriter out) {
                         mapping.setMethod(m.getName());
 
                         MappingUrls.put(m.getAnnotation(MethodAnnotation.class).url(), mapping);
-
 
                         for (String key : MappingUrls.keySet()) {
                             Mapping map = MappingUrls.get(key);
@@ -69,7 +71,6 @@ public void init(PrintWriter out) {
         out.println(e.getMessage());
     }
 }
-
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -92,10 +93,13 @@ public void init(PrintWriter out) {
 
         String url = request.getRequestURL().toString();
         String url2=util.getLastPartOfUrl(url);
-     
+
     
         try {
+
             Mapping mapping = MappingUrls.get(url2);
+            Class<?> classe = Class.forName(mapping.getClassName());
+            Object o = classe.getDeclaredConstructor().newInstance();
 
             out.println("mapping"+mapping);
 
@@ -103,9 +107,8 @@ public void init(PrintWriter out) {
                 throw new Exception("Not Found");
             }
 
-            Class<?> classe = Class.forName(mapping.getClassName());
             out.println("tonga");
-            Object o = classe.getDeclaredConstructor().newInstance();
+            
             ModelView mview = (ModelView) o.getClass().getMethod(mapping.getMethod()).invoke(o);
 
             HashMap<String,Object> datatest=new HashMap<String,Object>();
@@ -113,6 +116,7 @@ public void init(PrintWriter out) {
             datatest=mview.getData();
             
             if(datatest==null){
+
                 out.print("null");
             }
             if(datatest!=null){
@@ -122,14 +126,56 @@ public void init(PrintWriter out) {
                 }
                 
             }
+            Enumeration<String> parametre= request.getParameterNames();
 
+            while(parametre.hasMoreElements()){
+
+                String param=parametre.nextElement();
+                out.println(param);
+                Field[] fields = o.getClass().getDeclaredFields();
+                Field field=fields[1];
+    
+                if( field == null){
+                    continue;
+                }
+    
+                Object value = null;
+                Class<?> parameterType = o.getClass().getDeclaredMethod("set" + param , field.getType()).getParameterTypes()[0];
+    
+                if (parameterType == String.class) {
+                    value = request.getParameter(param);
+                } else if (parameterType == int.class || parameterType == Integer.class) {
+                    value = Integer.parseInt(request.getParameter(param));
+                } else if (parameterType == double.class || parameterType == Double.class) {
+                    value = Double.parseDouble(request.getParameter(param));
+                } else if (parameterType == boolean.class || parameterType == Boolean.class) {
+                    value = Boolean.parseBoolean(request.getParameter(param));
+                } else {
+            
+                    throw new IllegalArgumentException(" géré : " + parameterType.getName());
+                }
+    
+                o.getClass().getDeclaredMethod("set" + param, parameterType).invoke(o, value);
+                out.println("tonga " + value);
+
+            request.setAttribute("test",value);
             RequestDispatcher dispatcher = request.getRequestDispatcher(mview.getView());
             dispatcher.forward(request, response);
+
             out.println(mview.getView());
-        
+
+            }
+
 
         } catch (Exception e) {
-            out.println(e.getMessage());
+            try {
+                throw new Exception(url2, null);
+            } catch (Exception ex) {
+                // TODO: handle exception
+                ex.printStackTrace(out);
+            }
+            
+            
         }
 
      

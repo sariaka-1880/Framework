@@ -29,9 +29,19 @@ public class Emp {
 
     HashMap<String,Object> data=new HashMap<String,Object>();
 
-    data.put("test", "sariaka");
+    data.put("test", this.getNom());
     return new ModelView("test.jsp",data);
   
+  }
+
+ 
+  public ModelView Save(){
+
+      HashMap<String,Object> data=new HashMap<String,Object>();
+
+    data.put("test", this.getNom());
+    return new ModelView("test.jsp",data);
+    
   }
 
 
