@@ -7,7 +7,17 @@
   <title>Document</title>
 </head>
 <body>
+<h3>methode set attribut</h3>
   <form action="http://localhost:8080/TestFramework/test" method="post">
+
+    <input type="text" name="Nom">
+    <input type="text" name="Prenom" id="">
+    <input type="submit" value="valider" id="">
+    
+  </form>
+
+<h3>methode set parameter</h3>
+    <form action="http://localhost:8080/TestFramework/sprint" method="post">
 
     <input type="text" name="Nom">
     <input type="text" name="Prenom" id="">
