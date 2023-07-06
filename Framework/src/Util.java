@@ -17,7 +17,7 @@ import org.w3c.dom.css.DocumentCSS;
 import java.util.Objects;
 
 import java.io.PrintWriter;
-
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import java.util.HashMap;
@@ -104,6 +104,26 @@ public String getLastPartOfUrl(String url) {
   int lastSlashIndex = url.lastIndexOf("/");
   return url.substring(lastSlashIndex);
   
+}
+
+public Method getMethodByclassName(String Nomclasse , String method)throws NoSuchMethodError{
+  Method valiny=null;
+  try {
+
+    Class<?> clazz = Class.forName(Nomclasse);
+    Object o = clazz.getDeclaredConstructor().newInstance();
+    Method[] allMethods = o.getClass().getDeclaredMethods();
+    for(Method m : allMethods){
+      if(m.getName().equals(method)) {
+        valiny = m;
+        break;
+      }
+    }
+    
+  } catch (Exception e) {
+    // TODO: handle exception
+  }
+  return valiny;
 }
 
 }

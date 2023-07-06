@@ -7,6 +7,7 @@ import etu1880.framework.ModelView;
 
 
 public class Emp {
+
   String nom;
   String prenom;
 
@@ -23,7 +24,7 @@ public class Emp {
     this.prenom = prenom;
   }
 
-  @MethodAnnotation(url ="/test")
+@MethodAnnotation(url ="/test")
 
   public ModelView Affichernom(){
 
@@ -34,10 +35,14 @@ public class Emp {
   
   }
 
- 
-  public ModelView Save(){
+  @MethodAnnotation(url ="/sprint" , paramName = "Nom,Prenom")
 
-      HashMap<String,Object> data=new HashMap<String,Object>();
+  public ModelView print(String Nom, String Prenom){
+
+    HashMap<String,Object> data=new HashMap<String,Object>();
+
+    this.setNom(Nom);
+    this.setPrenom(Prenom);
 
     data.put("test", this.getNom());
     return new ModelView("test.jsp",data);
