@@ -1,10 +1,19 @@
 package util;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Part;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.List;
 import java.io.File;
+import java.io.IOException;
 
+import etu1880.framework.FileUpload;
 import etu1880.framework.Mapping;
 
+import javax.sql.rowset.serial.SerialException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -124,6 +133,14 @@ public Method getMethodByclassName(String Nomclasse , String method)throws NoSuc
     // TODO: handle exception
   }
   return valiny;
+}
+
+public static FileUpload getValueFile(HttpServletRequest request, String File) throws ServletException, IOException {
+  Part filePart = request.getPart(File);
+  FileUpload resultat = new FileUpload();
+  resultat.setName(filePart.getSubmittedFileName());
+  resultat.setFile(filePart.getInputStream().readAllBytes());
+  return resultat;
 }
 
 }

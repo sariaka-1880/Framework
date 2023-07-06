@@ -1,6 +1,8 @@
 package etu1880.framework.servlet;
 
 import util.Util;
+import etu1880.framework.Authentification;
+import etu1880.framework.FileUpload;
 import etu1880.framework.Mapping;
 import etu1880.framework.MethodAnnotation;
 import etu1880.framework.ModelView;
@@ -9,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.net.http.HttpClient;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
@@ -19,12 +22,14 @@ import jakarta.servlet.RequestDispatcher;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.MultipartConfig;
 import model.Emp;
 
 
-
+@MultipartConfig
 public class FrontServlet extends HttpServlet {
 
 HashMap<String,Mapping> MappingUrls = new HashMap<String,Mapping>();
@@ -89,7 +94,10 @@ public void init(PrintWriter out) {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         PrintWriter out = response.getWriter();
-       
+
+        String profileConnection = request.getParameter("Nom");
+        request.getSession().setAttribute("Nom", profileConnection);
+        String profile = (String) request.getSession().getAttribute("Nom");
         this.init(out);
 
         String url = request.getRequestURL().toString();
@@ -126,6 +134,7 @@ public void init(PrintWriter out) {
                     String[] paramNames = paramName.split(","); 
                     Class<?>[] parameterTypes = method.getParameterTypes();
 
+                
                     out.println("tonga2");
 
                     Object[] arguments = new Object[paramNames.length];
@@ -146,9 +155,11 @@ public void init(PrintWriter out) {
                                 arguments[i] = Double.parseDouble(request.getParameter(paramNom));
                             } else if (parameterType == boolean.class || parameterType == Boolean.class) {
                                 arguments[i]= Boolean.parseBoolean(request.getParameter(paramNom));
-                            } else {
-                        
-                                throw new IllegalArgumentException(" géré : " + parameterType.getName());
+                            } else if(parameterType == FileUpload.class){
+                                arguments[i] = util.getValueFile(request, paramNom);
+                            }else {
+
+                                throw new IllegalArgumentException(" gere : " + parameterType.getName());
                             }
                             out.println("tonga4");
 
@@ -177,6 +188,17 @@ public void init(PrintWriter out) {
                             dispatcher.forward(request, response);
                         }       
                     }
+                }if(method.isAnnotationPresent(Authentification.class) && method.isAnnotationPresent(MethodAnnotation.class)){
+                    Authentification annotation = method.getAnnotation(Authentification.class);
+                    String allowedProfiles = annotation.profile();
+                    System.out.println(allowedProfiles);
+                    System.out.println(profile);
+                    if(allowedProfiles.equals(profile)){
+                        System.out.println("mety");
+                    }else{
+                        throw new Exception("Permission DEnied", null);
+                    }
+                   
                 }
             }catch (Exception e) {
                     throw e;
@@ -184,8 +206,10 @@ public void init(PrintWriter out) {
 
             ModelView mview = (ModelView) o.getClass().getMethod(mapping.getMethod()).invoke(o);
             HashMap<String,Object> datatest=new HashMap<String,Object>();
+            HashMap<String,Object> datasessiont=new HashMap<String,Object>();
+
             datatest=mview.getData();
-            
+            datasessiont=mview.getSession();
             if(datatest==null){
 
                 out.print("null");
@@ -196,6 +220,15 @@ public void init(PrintWriter out) {
                        request.setAttribute(key,dataObject);            
                 }
                 
+            }if(datasessiont==null){
+                out.print("non");
+            }
+            if(datasessiont !=null){
+                for (String key : datasessiont.keySet()){
+                    Object dataObject=datasessiont.get(key);
+                    HttpSession session = request.getSession();
+                    session.setAttribute(key,dataObject);         
+                }  
             }
             Enumeration<String> parametre= request.getParameterNames();
 
@@ -221,7 +254,7 @@ public void init(PrintWriter out) {
                     value = Double.parseDouble(request.getParameter(param));
                 } else if (parameterType == boolean.class || parameterType == Boolean.class) {
                     value = Boolean.parseBoolean(request.getParameter(param));
-                } else {
+                }else {
             
                     throw new IllegalArgumentException(" géré : " + parameterType.getName());
                 }
