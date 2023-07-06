@@ -17,12 +17,26 @@
   </form>
 
 <h3>methode set parameter</h3>
-    <form action="http://localhost:8080/TestFramework/sprint" method="post">
+  <form action="http://localhost:8080/TestFramework/sprint" method="post">
 
     <input type="text" name="Nom">
     <input type="text" name="Prenom" id="">
     <input type="submit" value="valider" id="">
     
   </form>
+
+  <h3>file upload </h3>
+  <form action="http://localhost:8080/TestFramework/file" method="post" enctype="multipart/form-data" >
+    <input type="file" name="File">
+    <input type="submit" value="valider" id="">
+  </form>
+
+    <h3>connection</h3>
+  
+  <form action="http://localhost:8080/TestFramework/testprofile" method="post">
+    <input type="test" name="Nom">
+    <input type="submit" value="valider" id="">
+  </form>
+
 </body>
 </html>
